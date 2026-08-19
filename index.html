@@ -22,7 +22,7 @@
             <a href="https://karidasd.github.io/" target="_blank" class="nav-link">🌐 Portfolio</a>
         </nav>
         <div class="header-right">
-            <div class="on-air-badge"><span class="dot-ping"></span> LIVE ON AIR</div>
+            <div class="on-air-badge"><span class="dot-ping"></span> 24/7 ON AIR</div>
             <a href="https://github.com/karidasd/darkais-web-radio" target="_blank" class="star-btn">⭐ Star Radio</a>
         </div>
     </header>
@@ -31,26 +31,31 @@
         <div class="deck-layout">
             <!-- Left: Main DJ Deck & Visualizer -->
             <div class="main-console">
-                <!-- Station Selector Tabs -->
+                <!-- 8 Station Selector Tabs -->
                 <div class="station-tabs">
-                    <button class="station-btn active" onclick="playStation(0)">⚡ Berlin Dark Techno</button>
+                    <button class="station-btn active" onclick="playStation(0)">⚡ Berlin Techno</button>
                     <button class="station-btn" onclick="playStation(1)">☣️ 90s Acid Rave</button>
-                    <button class="station-btn" onclick="playStation(2)">🌌 Cyber Darksynth</button>
-                    <button class="station-btn" onclick="playStation(3)">🌀 Dark Psytrance</button>
-                    <button class="station-btn ai-synth" onclick="playStation(4)">🤖 AI-303 Procedural</button>
+                    <button class="station-btn" onclick="playStation(2)">🏴‍☠️ Drum & Bass</button>
+                    <button class="station-btn" onclick="playStation(3)">🌌 Darksynth</button>
+                    <button class="station-btn" onclick="playStation(4)">⚡ Industrial Darkwave</button>
+                    <button class="station-btn" onclick="playStation(5)">🌀 Psytrance Goa</button>
+                    <button class="station-btn" onclick="playStation(6)">🚀 French Complextro</button>
+                    <button class="station-btn" onclick="playStation(7)">🍵 Lo-Fi Cyber Chill</button>
                 </div>
 
                 <!-- Visualizer Display Box -->
-                <div class="visualizer-display">
+                <div class="visualizer-display" id="visualizerDisplayBox">
                     <div class="visualizer-header">
                         <div class="track-info-box">
-                            <span class="now-playing-tag">CURRENTLY STREAMING //</span>
+                            <span class="now-playing-tag">CURRENT STATION //</span>
                             <h2 class="track-title" id="trackTitle">Berlin Underground Dark Techno</h2>
                             <p class="track-subtitle" id="trackSubtitle">140 BPM • Industrial & Acid Drops</p>
                         </div>
                         <div class="vis-mode-pills">
-                            <button class="vis-pill active" data-mode="bars">SPECTRUM BARS</button>
+                            <button class="vis-pill active" data-mode="tunnel">3D LASER TUNNEL</button>
+                            <button class="vis-pill" data-mode="bars">SPECTRUM BARS</button>
                             <button class="vis-pill" data-mode="wave">OSCILLOSCOPE</button>
+                            <button class="vis-pill" onclick="toggleFullscreenRave()" style="border-color:var(--acid); color:var(--acid);">📺 FULLSCREEN</button>
                         </div>
                     </div>
                     <canvas id="visualizerCanvas" width="900" height="260"></canvas>
@@ -62,8 +67,16 @@
 
                     <div class="audio-sliders">
                         <div class="slider-group">
-                            <label>MASTER VOLUME</label>
+                            <label>VOLUME</label>
                             <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.8">
+                        </div>
+                        <div class="slider-group">
+                            <label>BASS BOOST (+12dB)</label>
+                            <input type="range" id="bassBoostSlider" min="0" max="14" step="1" value="6" style="accent-color:var(--acid);">
+                        </div>
+                        <div class="slider-group">
+                            <label>TREBLE BRIGHTNESS</label>
+                            <input type="range" id="trebleSlider" min="-6" max="10" step="1" value="3" style="accent-color:var(--cyan);">
                         </div>
                     </div>
 
@@ -73,42 +86,46 @@
                 </div>
             </div>
 
-            <!-- Right Sidebar: Live Synth Engine & Rave Chat -->
+            <!-- Right Sidebar: DJ Sound FX Launchpad & Pomodoro -->
             <aside class="sidebar-panel">
-                <!-- Live Procedural Synth Controls -->
+                <!-- DJ Sound FX Launchpad -->
                 <div class="deck-card">
                     <div class="card-header">
-                        <h3>🎛️ AI-303 Synth Controls</h3>
-                        <span class="mono" style="font-size:11px; color:var(--purple);" id="bpmDisplay">140 BPM</span>
+                        <h3>🎛️ DJ Sound FX Launchpad</h3>
+                        <span class="mono" style="font-size:10px; color:var(--cyan);">LIVE PADS</span>
                     </div>
-                    <div class="synth-grid">
-                        <div class="synth-knob-box">
-                            <span>TEMPO (BPM)</span>
-                            <input type="range" id="synthBpm" min="120" max="165" step="1" value="140">
-                        </div>
-                        <div class="synth-knob-box">
-                            <span>CUTOFF FILTER</span>
-                            <input type="range" id="synthCutoff" min="400" max="3200" step="50" value="1100">
-                        </div>
-                        <div class="synth-knob-box">
-                            <span>RESONANCE</span>
-                            <input type="range" id="synthRes" min="5" max="28" step="1" value="18">
-                        </div>
-                        <div class="synth-knob-box" style="display:flex; align-items:center; justify-content:center;">
-                            <button class="deck-btn" onclick="generateNewAcidPattern()" style="width:100%; border-color:var(--purple); color:var(--purple); font-size:10px;">🔄 MUTATE ACID</button>
-                        </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
+                        <button class="deck-btn" onclick="triggerFx('airhorn')" style="border-color:var(--warning); color:var(--warning); font-size:11px;">🚨 AIRHORN</button>
+                        <button class="deck-btn" onclick="triggerFx('drop')" style="border-color:var(--danger); color:var(--danger); font-size:11px;">💥 BASS DROP</button>
+                        <button class="deck-btn" onclick="triggerFx('laser')" style="border-color:var(--acid); color:var(--acid); font-size:11px;">⚡ ACID LASER</button>
+                        <button class="deck-btn" onclick="triggerFx('voice')" style="border-color:var(--purple); color:var(--purple); font-size:11px;">🗣️ CYBER VOICE</button>
+                        <button class="deck-btn" onclick="triggerFx('scratch')" style="grid-column: span 2; border-color:var(--cyan); color:var(--cyan); font-size:11px;">🎚️ VINYL SCRATCH</button>
                     </div>
                 </div>
 
-                <!-- Live Rave Chat Stream -->
+                <!-- Developer Focus / Pomodoro Timer -->
                 <div class="deck-card">
                     <div class="card-header">
-                        <h3>💬 Cyber Rave Terminal</h3>
-                        <span class="mono" style="font-size:10px; color:var(--acid);">● 342 ONLINE</span>
+                        <h3>⏱️ Rave Focus Pomodoro</h3>
+                        <span class="mono" style="font-size:11px; color:var(--acid);" id="timerStatus">OFF</span>
                     </div>
-                    <div class="chat-log-box" id="chatLogBox">
-                        <div class="chat-msg"><span class="chat-time">07:50</span><span class="chat-user">BerlinRauser:</span> DarkAIs 24/7 stream engaged! 🔥</div>
-                        <div class="chat-msg"><span class="chat-time">07:51</span><span class="chat-user">CyberAcid:</span> 303 resonance sounding lethal ⚡</div>
+                    <div style="display:flex; gap:6px; margin-top:8px;">
+                        <button class="deck-btn" onclick="startPomodoro(25)" style="flex:1; font-size:10px;">25M FOCUS</button>
+                        <button class="deck-btn" onclick="startPomodoro(45)" style="flex:1; font-size:10px;">45M DEEP</button>
+                        <button class="deck-btn" onclick="startPomodoro(5)" style="flex:1; font-size:10px;">5M REST</button>
+                    </div>
+                </div>
+
+                <!-- Station Stats -->
+                <div class="deck-card">
+                    <div class="card-header">
+                        <h3>📊 Station Telemetry</h3>
+                        <span class="mono" style="font-size:10px; color:var(--acid);">● ACTIVE</span>
+                    </div>
+                    <div style="font-size:12px; display:flex; flex-direction:column; gap:6px; color:var(--text-secondary);">
+                        <div>Tempo: <strong style="color:#FFF;" id="bpmStat">140 BPM</strong></div>
+                        <div>Stream Quality: <strong style="color:var(--cyan);">128 kbps MP3 Direct CDN</strong></div>
+                        <div>Network Latency: <strong style="color:var(--acid);">14 ms (Zero-Buffer)</strong></div>
                     </div>
                 </div>
             </aside>
