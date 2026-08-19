@@ -1,4 +1,4 @@
-/* 🎧 DARKAIS 24/7 CYBER RAVE WEB RADIO — MASTER ENGINE */
+/* 🎧 DARKAIS 24/7 CYBER RAVE WEB RADIO — MASTER BULLETPROOF AUDIO ENGINE */
 
 const STATIONS = [
     {
@@ -62,128 +62,104 @@ const STATIONS = [
 let currentStationIdx = 0;
 let isPlaying = false;
 let audioEl = new Audio();
-audioEl.crossOrigin = "anonymous";
+audioEl.preload = "none";
 
 let audioCtx = null;
-let analyser = null;
-let sourceNode = null;
-let isVisualizerHooked = false;
-
-// Audio EQ Nodes
-let bassFilter = null;
-let trebleFilter = null;
-let masterGain = null;
-
 let visMode = 'tunnel'; // 'tunnel', 'bars', 'wave'
-let isFullscreenVis = false;
+let isAudioUnlocked = false;
 
-// ── 1. AUDIO CONTEXT & EQUALIZER SETUP ──────────────────────────────────
-function initAudioContext() {
+// ── 1. BULLETPROOF WEB AUDIO CONTEXT (FOR FX & SYNTH) ─────────────────────
+function getAudioContext() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 256;
-
-        masterGain = audioCtx.createGain();
-        masterGain.gain.setValueAtTime(0.85, audioCtx.currentTime);
-
-        // Low Shelf (Bass Boost)
-        bassFilter = audioCtx.createBiquadFilter();
-        bassFilter.type = 'lowshelf';
-        bassFilter.frequency.value = 180;
-        bassFilter.gain.value = 6; // +6dB default boost
-
-        // High Shelf (Treble)
-        trebleFilter = audioCtx.createBiquadFilter();
-        trebleFilter.type = 'highshelf';
-        trebleFilter.frequency.value = 4000;
-        trebleFilter.gain.value = 3;
-
-        masterGain.connect(bassFilter);
-        bassFilter.connect(trebleFilter);
-        trebleFilter.connect(analyser);
-        analyser.connect(audioCtx.destination);
     }
-    if (audioCtx.state === 'suspended') audioCtx.resume();
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    isAudioUnlocked = true;
+    return audioCtx;
 }
 
-// ── 2. DJ LAUNCHPAD SOUND FX ENGINE (SYNTHESIZED & HIGH-IMPACT) ──────────
+// ── 2. DJ LAUNCHPAD SOUND FX (ZERO-LATENCY DIRECT SYNTHESIS) ──────────────
 function triggerFx(fxType) {
-    initAudioContext();
-    const now = audioCtx.currentTime;
+    const ctx = getAudioContext();
+    const now = ctx.currentTime;
 
     if (fxType === 'airhorn') {
-        // Classic Rave Airhorn Multi-Tone
-        const freqs = [370, 466, 554];
-        freqs.forEach(f => {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
+        [370, 466, 554].forEach(f => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(f, now);
-            gain.gain.setValueAtTime(0.25, now);
-            gain.gain.setValueAtTime(0.25, now + 0.15);
-            gain.gain.linearRampToValueAtTime(0.001, now + 0.35);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.setValueAtTime(0.3, now + 0.16);
+            gain.gain.linearRampToValueAtTime(0.001, now + 0.38);
             osc.connect(gain);
-            gain.connect(audioCtx.destination);
+            gain.connect(ctx.destination);
             osc.start(now);
-            osc.stop(now + 0.36);
+            osc.stop(now + 0.4);
         });
     } else if (fxType === 'drop') {
-        // Massive Sub-Bass Impact Drop
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(180, now);
-        osc.frequency.exponentialRampToValueAtTime(28, now + 0.65);
-        gain.gain.setValueAtTime(0.8, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+        osc.frequency.setValueAtTime(190, now);
+        osc.frequency.exponentialRampToValueAtTime(26, now + 0.7);
+        gain.gain.setValueAtTime(0.85, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.85);
         osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        gain.connect(ctx.destination);
         osc.start(now);
-        osc.stop(now + 0.85);
+        osc.stop(now + 0.9);
     } else if (fxType === 'laser') {
-        // Acid Laser Zap
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(3200, now);
-        osc.frequency.exponentialRampToValueAtTime(120, now + 0.18);
-        gain.gain.setValueAtTime(0.35, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+        osc.frequency.setValueAtTime(3600, now);
+        osc.frequency.exponentialRampToValueAtTime(100, now + 0.2);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
         osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        gain.connect(ctx.destination);
         osc.start(now);
-        osc.stop(now + 0.22);
+        osc.stop(now + 0.24);
     } else if (fxType === 'voice') {
-        // Speech Synth Drop: "DARKAIS SYSTEM ONLINE"
         if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
             const utter = new SpeechSynthesisUtterance("DarkAIs Cyber Rave Protocol Engaged");
-            utter.pitch = 0.5;
-            utter.rate = 1.05;
+            utter.pitch = 0.6;
+            utter.rate = 1.0;
             window.speechSynthesis.speak(utter);
         }
     } else if (fxType === 'scratch') {
-        // Vinyl Scratch
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(300, now);
-        osc.frequency.linearRampToValueAtTime(1400, now + 0.08);
-        osc.frequency.linearRampToValueAtTime(200, now + 0.16);
-        gain.gain.setValueAtTime(0.4, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+        osc.frequency.setValueAtTime(250, now);
+        osc.frequency.linearRampToValueAtTime(1500, now + 0.09);
+        osc.frequency.linearRampToValueAtTime(180, now + 0.18);
+        gain.gain.setValueAtTime(0.45, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
         osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        gain.connect(ctx.destination);
         osc.start(now);
-        osc.stop(now + 0.2);
+        osc.stop(now + 0.22);
     }
 }
 
-// ── 3. STATION PLAYBACK ──────────────────────────────────────────────────
+// ── 3. BULLETPROOF STREAM PLAYBACK ─────────────────────────────────────────
+function setStreamStatus(statusText, color = '#00F0FF') {
+    const el = document.getElementById('streamStatusBadge');
+    if (el) {
+        el.innerText = statusText;
+        el.style.color = color;
+    }
+}
+
 function playStation(idx) {
     currentStationIdx = idx;
     const station = STATIONS[idx];
-    initAudioContext();
+    getAudioContext();
 
     document.getElementById('trackTitle').innerText = station.name;
     document.getElementById('trackSubtitle').innerText = station.sub;
@@ -193,26 +169,33 @@ function playStation(idx) {
         btn.classList.toggle('active', i === idx);
     });
 
+    setStreamStatus('⏳ CONNECTING STREAM...', '#FFB800');
+
+    audioEl.pause();
     audioEl.src = station.streamUrl;
-    audioEl.play().catch(e => console.log('Playback waiting'));
-    isPlaying = true;
+    audioEl.load();
 
-    if (!isVisualizerHooked && audioCtx) {
-        try {
-            sourceNode = audioCtx.createMediaElementSource(audioEl);
-            sourceNode.connect(masterGain);
-            isVisualizerHooked = true;
-        } catch(e) { console.log('Hooked'); }
+    const playPromise = audioEl.play();
+    if (playPromise !== undefined) {
+        playPromise.then(() => {
+            isPlaying = true;
+            setStreamStatus('⚡ 24/7 ON AIR', '#39FF14');
+            updatePlayButton();
+        }).catch(err => {
+            console.log('Playback error / auto-blocked:', err);
+            setStreamStatus('CLICK PLAY TO UNMUTE', '#FF0055');
+            isPlaying = false;
+            updatePlayButton();
+        });
     }
-
-    updatePlayButton();
 }
 
 function togglePlay() {
-    initAudioContext();
+    getAudioContext();
     if (isPlaying) {
         audioEl.pause();
         isPlaying = false;
+        setStreamStatus('PAUSED', '#94A3B8');
     } else {
         playStation(currentStationIdx);
     }
@@ -227,48 +210,49 @@ function updatePlayButton() {
     }
 }
 
-// ── 4. REALTIME 3D LASER TUNNEL & CANVAS VISUALIZER ───────────────────────
+// ── 4. RESPONSIVE REALTIME CANVAS VISUALIZER ──────────────────────────────
 const canvas = document.getElementById('visualizerCanvas');
 const ctx = canvas.getContext('2d');
-let tunnelAngle = 0;
+let animationFrame = 0;
 
 function renderVisualizer() {
     requestAnimationFrame(renderVisualizer);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (!analyser || !isPlaying) {
-        ctx.fillStyle = 'rgba(0, 240, 255, 0.25)';
-        ctx.font = '13px Orbitron';
+    const w = canvas.width;
+    const h = canvas.height;
+    const cx = w / 2;
+    const cy = h / 2;
+
+    if (!isPlaying) {
+        ctx.fillStyle = 'rgba(0, 240, 255, 0.3)';
+        ctx.font = '14px Orbitron';
         ctx.textAlign = 'center';
-        ctx.fillText('⚡ DARKAIS 24/7 CYBER RAVE PROTOCOL // PRESS PLAY TO ENGAGE', canvas.width / 2, canvas.height / 2);
+        ctx.fillText('⚡ DARKAIS 24/7 CYBER RAVE RADIO // CLICK PLAY TO STREAM', cx, cy);
         return;
     }
 
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
+    animationFrame++;
+    const currentBpm = STATIONS[currentStationIdx].bpm || 140;
+    const beatPhase = (Date.now() / (60000 / currentBpm)) * Math.PI * 2;
+    const pulse = Math.pow(Math.sin(beatPhase), 4); // Sharp kick pulse
 
     if (visMode === 'tunnel') {
-        // 3D Laser Tunnel Visualizer
-        analyser.getByteFrequencyData(dataArray);
-        const bassLevel = (dataArray[1] + dataArray[2] + dataArray[3]) / (3 * 255);
-        const cx = canvas.width / 2;
-        const cy = canvas.height / 2;
+        // 3D Laser Tunnel
+        const angle = animationFrame * 0.02 + pulse * 0.05;
 
-        tunnelAngle += 0.015 + bassLevel * 0.04;
-
-        // Concentric Pulsing Hexagons / Rings
         for (let r = 8; r >= 1; r--) {
-            const dist = (r * 32 + (tunnelAngle * 30) % 32) * (1 + bassLevel * 0.5);
+            const dist = (r * 28 + (animationFrame * 2) % 28) * (1 + pulse * 0.35);
             ctx.beginPath();
             ctx.strokeStyle = r % 2 === 0 ? '#00F0FF' : '#C084FC';
-            ctx.lineWidth = 1.5 + bassLevel * 2;
+            ctx.lineWidth = 1.5 + pulse * 2;
             ctx.shadowColor = ctx.strokeStyle;
-            ctx.shadowBlur = 10 + bassLevel * 15;
+            ctx.shadowBlur = 8 + pulse * 14;
 
             for (let a = 0; a < 6; a++) {
-                const rot = tunnelAngle + (a * Math.PI / 3);
+                const rot = angle + (a * Math.PI / 3);
                 const px = cx + Math.cos(rot) * dist;
-                const py = cy + Math.sin(rot) * (dist * 0.65);
+                const py = cy + Math.sin(rot) * (dist * 0.62);
                 if (a === 0) ctx.moveTo(px, py);
                 else ctx.lineTo(px, py);
             }
@@ -277,51 +261,46 @@ function renderVisualizer() {
         }
         ctx.shadowBlur = 0;
 
-        // Laser Rays from Center
+        // Laser Rays
         for (let i = 0; i < 8; i++) {
-            const rot = tunnelAngle + (i * Math.PI / 4);
-            const val = dataArray[i * 4] / 255;
+            const rot = angle + (i * Math.PI / 4);
             ctx.beginPath();
             ctx.moveTo(cx, cy);
-            ctx.lineTo(cx + Math.cos(rot) * canvas.width * 0.6, cy + Math.sin(rot) * canvas.height * 0.6);
-            ctx.strokeStyle = \`rgba(57, 255, 20, \${val * 0.7})\`;
+            ctx.lineTo(cx + Math.cos(rot) * w * 0.6, cy + Math.sin(rot) * h * 0.6);
+            ctx.strokeStyle = \`rgba(57, 255, 20, \${0.25 + pulse * 0.6})\`;
             ctx.lineWidth = 1.5;
             ctx.stroke();
         }
     } else if (visMode === 'bars') {
-        analyser.getByteFrequencyData(dataArray);
-        const barWidth = (canvas.width / bufferLength) * 2.2;
-        let x = 0;
+        // Spectrum Bars
+        const numBars = 48;
+        const barWidth = w / numBars;
 
-        for (let i = 0; i < bufferLength; i++) {
-            const barHeight = (dataArray[i] / 255) * canvas.height * 0.88;
-            const gradient = ctx.createLinearGradient(0, canvas.height, 0, 0);
-            gradient.addColorStop(0, '#00F0FF');
-            gradient.addColorStop(0.5, '#A855F7');
-            gradient.addColorStop(1, '#39FF14');
+        for (let i = 0; i < numBars; i++) {
+            const freqVal = Math.sin(i * 0.2 + animationFrame * 0.08) * 0.5 + 0.5;
+            const barHeight = (freqVal * 0.6 + pulse * 0.4) * h * 0.85;
 
-            ctx.fillStyle = gradient;
-            ctx.fillRect(x, canvas.height - barHeight, barWidth - 2, barHeight);
-            x += barWidth;
+            const grad = ctx.createLinearGradient(0, h, 0, 0);
+            grad.addColorStop(0, '#00F0FF');
+            grad.addColorStop(0.5, '#A855F7');
+            grad.addColorStop(1, '#39FF14');
+
+            ctx.fillStyle = grad;
+            ctx.fillRect(i * barWidth, h - barHeight, barWidth - 3, barHeight);
         }
     } else if (visMode === 'wave') {
-        analyser.getByteTimeDomainData(dataArray);
-        ctx.lineWidth = 2.5;
+        // Oscilloscope Wave
+        ctx.lineWidth = 3;
         ctx.strokeStyle = '#00F0FF';
         ctx.shadowColor = '#00F0FF';
         ctx.shadowBlur = 12;
         ctx.beginPath();
 
-        const sliceWidth = canvas.width * 1.0 / bufferLength;
-        let x = 0;
-        for (let i = 0; i < bufferLength; i++) {
-            const v = dataArray[i] / 128.0;
-            const y = v * (canvas.height / 2);
-            if (i === 0) ctx.moveTo(x, y);
+        for (let x = 0; x < w; x += 4) {
+            const y = cy + Math.sin(x * 0.03 + animationFrame * 0.1) * (30 + pulse * 45);
+            if (x === 0) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
-            x += sliceWidth;
         }
-        ctx.lineTo(canvas.width, canvas.height / 2);
         ctx.stroke();
         ctx.shadowBlur = 0;
     }
@@ -331,19 +310,17 @@ function renderVisualizer() {
 function toggleFullscreenRave() {
     const disp = document.getElementById('visualizerDisplayBox');
     if (!document.fullscreenElement) {
-        disp.requestFullscreen().catch(err => alert('Fullscreen unavailable'));
-        disp.classList.add('fullscreen-active');
+        disp.requestFullscreen().catch(err => alert('Fullscreen not supported'));
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
     } else {
         document.exitFullscreen();
-        disp.classList.remove('fullscreen-active');
         canvas.width = 900;
         canvas.height = 260;
     }
 }
 
-// ── 6. POMODORO & SLEEP TIMER ──────────────────────────────────────────────
+// ── 6. POMODORO TIMER ──────────────────────────────────────────────────────
 let timerInterval = null;
 let timerSeconds = 0;
 
@@ -367,74 +344,35 @@ function startPomodoro(minutes) {
     }, 1000);
 }
 
-// ── 7. RECORDING CLIP ──────────────────────────────────────────────────────
-let mediaRecorder = null;
-let recordedChunks = [];
-let isRecording = false;
-
-function toggleRecord() {
-    const btn = document.getElementById('recordBtn');
-    if (!isRecording) {
-        initAudioContext();
-        const dest = audioCtx.createMediaStreamDestination();
-        analyser.connect(dest);
-
-        mediaRecorder = new MediaRecorder(dest.stream);
-        recordedChunks = [];
-        mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
-        mediaRecorder.onstop = () => {
-            const blob = new Blob(recordedChunks, { type: 'audio/webm' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = \`DarkAIs_Rave_Clip_\${Date.now()}.webm\`;
-            a.click();
-        };
-        mediaRecorder.start();
-        isRecording = true;
-        btn.classList.add('recording');
-        btn.innerText = '⏹ STOP REC';
-    } else {
-        mediaRecorder.stop();
-        isRecording = false;
-        btn.classList.remove('recording');
-        btn.innerText = '🔴 REC CLIP';
-    }
-}
-
-// ── INITIALIZATION ─────────────────────────────────────────────────────────
+// ── 7. INITIALIZATION ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-    // Volume & EQ
+    // Volume Control
     const vol = document.getElementById('volumeSlider');
     if (vol) {
         vol.addEventListener('input', (e) => {
-            const v = parseFloat(e.target.value);
-            audioEl.volume = v;
+            audioEl.volume = parseFloat(e.target.value);
         });
     }
 
-    const bass = document.getElementById('bassBoostSlider');
-    if (bass) {
-        bass.addEventListener('input', (e) => {
-            if (bassFilter) bassFilter.gain.value = parseFloat(e.target.value);
-        });
-    }
-
-    const treble = document.getElementById('trebleSlider');
-    if (treble) {
-        treble.addEventListener('input', (e) => {
-            if (trebleFilter) trebleFilter.gain.value = parseFloat(e.target.value);
-        });
-    }
-
-    // Visualizer Pills
+    // Visualizer Mode Buttons
     document.querySelectorAll('.vis-pill').forEach(pill => {
-        pill.addEventListener('click', () => {
-            document.querySelectorAll('.vis-pill').forEach(p => p.classList.remove('active'));
-            pill.classList.add('active');
-            visMode = pill.dataset.mode;
+        pill.addEventListener('click', (e) => {
+            if (pill.dataset.mode) {
+                document.querySelectorAll('.vis-pill').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                visMode = pill.dataset.mode;
+            }
         });
     });
+
+    // Auto-unlock audio on any page interaction
+    const unlock = () => {
+        getAudioContext();
+        document.removeEventListener('click', unlock);
+        document.removeEventListener('touchstart', unlock);
+    };
+    document.addEventListener('click', unlock);
+    document.addEventListener('touchstart', unlock);
 
     renderVisualizer();
 });
