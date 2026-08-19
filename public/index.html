@@ -83,12 +83,19 @@
                     </div>
                     <div class="synth-grid">
                         <div class="synth-knob-box">
-                            <span>BPM TEMPO</span>
+                            <span>TEMPO (BPM)</span>
                             <input type="range" id="synthBpm" min="120" max="165" step="1" value="140">
                         </div>
                         <div class="synth-knob-box">
+                            <span>CUTOFF FILTER</span>
+                            <input type="range" id="synthCutoff" min="400" max="3200" step="50" value="1100">
+                        </div>
+                        <div class="synth-knob-box">
                             <span>RESONANCE</span>
-                            <input type="range" id="synthCutoff" min="300" max="2200" step="50" value="900">
+                            <input type="range" id="synthRes" min="5" max="28" step="1" value="18">
+                        </div>
+                        <div class="synth-knob-box" style="display:flex; align-items:center; justify-content:center;">
+                            <button class="deck-btn" onclick="generateNewAcidPattern()" style="width:100%; border-color:var(--purple); color:var(--purple); font-size:10px;">🔄 MUTATE ACID</button>
                         </div>
                     </div>
                 </div>

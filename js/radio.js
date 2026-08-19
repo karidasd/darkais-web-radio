@@ -1,4 +1,4 @@
-/* 🎧 DARKAIS WEB RADIO — AUDIO ENGINE & GENERATIVE 303 ACID SYNTH */
+/* 🎧 DARKAIS WEB RADIO — UPGRADED AUDIO ENGINE & PROCEDURAL ACID GROOVEBOX */
 
 const STATIONS = [
     {
@@ -32,7 +32,7 @@ const STATIONS = [
     {
         id: "procedural",
         name: "⚡ DarkAIs Procedural AI-303 Engine",
-        sub: "Algorithmic Real-Time Browser Synthesis",
+        sub: "Evolving 16-Step Acid Riffs + Full 909 Drum Kit",
         streamUrl: null,
         mode: "synth"
     }
@@ -48,84 +48,258 @@ let analyser = null;
 let sourceNode = null;
 let isVisualizerHooked = false;
 
-let visMode = 'bars'; // 'bars', 'wave', 'circle'
+let delayNode = null;
+let distortionNode = null;
+let masterGain = null;
 
-// ── 1. PROCEDURAL 303 SYNTH & 909 DRUM ENGINE ─────────────────────────────
+let visMode = 'bars'; // 'bars', 'wave'
+
+// ── 1. PROCEDURAL 303 ACID + 909 DRUM SEQUENCER ──────────────────────────
 let synthInterval = null;
 let synthStep = 0;
+let totalStepsPlayed = 0;
 let synthBpm = 140;
-let synthResonance = 14;
-let synthCutoff = 800;
+let synthResonance = 18;
+let synthCutoff = 1100;
+let synthDrive = 20;
+
+// Scales (D Minor Acid / Phrygian)
+const ACID_SCALE = [
+    73.42,  // D2
+    77.78,  // D#2
+    87.31,  // F2
+    98.00,  // G2
+    110.00, // A2
+    116.54, // A#2
+    130.81, // C3
+    146.83, // D3
+    155.56, // D#3
+    174.61, // F3
+    196.00, // G3
+    220.00, // A3
+    261.63, // C4
+    293.66  // D4
+];
+
+// Current 16-step Acid Pattern: { freq, isAccent, isSlide, isRest }
+let currentPattern = [];
+
+function generateNewAcidPattern() {
+    currentPattern = [];
+    for (let i = 0; i < 16; i++) {
+        const isRest = Math.random() < 0.15 && (i % 4 !== 0);
+        const freq = ACID_SCALE[Math.floor(Math.random() * ACID_SCALE.length)];
+        const isAccent = Math.random() < 0.35 || (i % 4 === 0);
+        const isSlide = Math.random() < 0.25 && i > 0;
+        currentPattern.push({ freq, isAccent, isSlide, isRest });
+    }
+}
+generateNewAcidPattern();
+
+function mutatePattern() {
+    // Modify 2-3 random steps to keep the groove evolving
+    for (let k = 0; k < 3; k++) {
+        const idx = Math.floor(Math.random() * 16);
+        currentPattern[idx].freq = ACID_SCALE[Math.floor(Math.random() * ACID_SCALE.length)];
+        currentPattern[idx].isAccent = Math.random() < 0.4;
+        currentPattern[idx].isSlide = Math.random() < 0.3;
+    }
+}
+
+function makeDistortionCurve(amount) {
+    const k = typeof amount === 'number' ? amount : 20;
+    const n_samples = 44100;
+    const curve = new Float32Array(n_samples);
+    const deg = Math.PI / 180;
+    for (let i = 0; i < n_samples; ++i) {
+        const x = (i * 2) / n_samples - 1;
+        curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
+    }
+    return curve;
+}
 
 function initAudioContext() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         analyser = audioCtx.createAnalyser();
         analyser.fftSize = 256;
+
+        masterGain = audioCtx.createGain();
+        masterGain.gain.setValueAtTime(0.85, audioCtx.currentTime);
+
+        // Saturation / Distortion
+        distortionNode = audioCtx.createWaveShaper();
+        distortionNode.curve = makeDistortionCurve(synthDrive);
+        distortionNode.oversample = '4x';
+
+        // Ping-Pong Delay
+        delayNode = audioCtx.createDelay();
+        delayNode.delayTime.value = (60 / synthBpm) * 0.75; // 3/16th dotted delay
+        const delayFeedback = audioCtx.createGain();
+        delayFeedback.gain.value = 0.35;
+        const delayFilter = audioCtx.createBiquadFilter();
+        delayFilter.frequency.value = 2500;
+
+        delayNode.connect(delayFilter);
+        delayFilter.connect(delayFeedback);
+        delayFeedback.connect(delayNode);
+        delayFilter.connect(masterGain);
+
+        distortionNode.connect(masterGain);
+        distortionNode.connect(delayNode);
+
+        masterGain.connect(analyser);
+        analyser.connect(audioCtx.destination);
     }
     if (audioCtx.state === 'suspended') audioCtx.resume();
 }
 
-function play303Note(freq, time) {
-    if (!audioCtx) return;
+// ── 303 SYNTH VOICE WITH SQUELCH FILTER ──────────────────────────────────
+let prevFreq = 73.42;
+
+function play303Step(stepData, time) {
+    if (!audioCtx || stepData.isRest) return;
+
     const osc = audioCtx.createOscillator();
     const filter = audioCtx.createBiquadFilter();
     const gain = audioCtx.createGain();
 
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(freq, time);
+    osc.type = Math.random() > 0.4 ? 'sawtooth' : 'square';
+    
+    // Slide (Portamento)
+    if (stepData.isSlide) {
+        osc.frequency.setValueAtTime(prevFreq, time);
+        osc.frequency.exponentialRampToValueAtTime(stepData.freq, time + 0.08);
+    } else {
+        osc.frequency.setValueAtTime(stepData.freq, time);
+    }
+    prevFreq = stepData.freq;
 
+    // Resonant Filter Envelope
     filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(synthCutoff, time);
-    filter.frequency.exponentialRampToValueAtTime(synthCutoff * 3, time + 0.05);
-    filter.frequency.exponentialRampToValueAtTime(synthCutoff * 0.4, time + 0.18);
-    filter.Q.setValueAtTime(synthResonance, time);
+    const baseCut = synthCutoff * (stepData.isAccent ? 1.6 : 1.0);
+    filter.frequency.setValueAtTime(baseCut * 0.5, time);
+    filter.frequency.exponentialRampToValueAtTime(baseCut * (stepData.isAccent ? 3.5 : 2.2), time + 0.04);
+    filter.frequency.exponentialRampToValueAtTime(baseCut * 0.3, time + (stepData.isSlide ? 0.24 : 0.14));
+    filter.Q.setValueAtTime(synthResonance * (stepData.isAccent ? 1.3 : 1.0), time);
 
-    gain.gain.setValueAtTime(0.2, time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.2);
+    const amp = stepData.isAccent ? 0.32 : 0.22;
+    gain.gain.setValueAtTime(amp, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + (stepData.isSlide ? 0.22 : 0.15));
 
     osc.connect(filter);
     filter.connect(gain);
-    gain.connect(analyser);
-    analyser.connect(audioCtx.destination);
-
-    osc.start(time);
-    osc.stop(time + 0.22);
-}
-
-function play909Kick(time) {
-    if (!audioCtx) return;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-
-    osc.frequency.setValueAtTime(150, time);
-    osc.frequency.exponentialRampToValueAtTime(35, time + 0.09);
-
-    gain.gain.setValueAtTime(0.4, time);
-    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.25);
-
-    osc.connect(gain);
-    gain.connect(analyser);
-    analyser.connect(audioCtx.destination);
+    gain.connect(distortionNode);
 
     osc.start(time);
     osc.stop(time + 0.25);
 }
 
+// ── 909 DRUM VOICES ──────────────────────────────────────────────────────
+function play909Kick(time) {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.frequency.setValueAtTime(160, time);
+    osc.frequency.exponentialRampToValueAtTime(42, time + 0.07);
+
+    gain.gain.setValueAtTime(0.7, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.26);
+
+    osc.connect(gain);
+    gain.connect(masterGain);
+
+    osc.start(time);
+    osc.stop(time + 0.26);
+}
+
+function play909HiHat(time, isOpen) {
+    if (!audioCtx) return;
+    // White Noise buffer for crisp metallic hat
+    const bufferSize = audioCtx.sampleRate * (isOpen ? 0.18 : 0.04);
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'highpass';
+    filter.frequency.value = 7500;
+
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(isOpen ? 0.25 : 0.14, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + (isOpen ? 0.16 : 0.035));
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(masterGain);
+
+    noise.start(time);
+    noise.stop(time + (isOpen ? 0.18 : 0.04));
+}
+
+function play909Clap(time) {
+    if (!audioCtx) return;
+    const bufferSize = audioCtx.sampleRate * 0.16;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 1200;
+    filter.Q.value = 2.5;
+
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(0.35, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.15);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(masterGain);
+
+    noise.start(time);
+    noise.stop(time + 0.16);
+}
+
+// ── GROOVEBOX SEQUENCER LOOP ─────────────────────────────────────────────
 function startProceduralSynth() {
     stopProceduralSynth();
     initAudioContext();
-    const scale = [65.41, 77.78, 87.31, 98.00, 116.54, 130.81, 155.56, 174.61]; // C Minor Pentatonic / Acid
     const stepDuration = (60 / synthBpm) / 4; // 16th notes
 
     synthInterval = setInterval(() => {
         const now = audioCtx.currentTime;
-        if (synthStep % 4 === 0) play909Kick(now); // 4-on-the-floor Kick
-        if (Math.random() > 0.2) {
-            const f = scale[Math.floor(Math.random() * scale.length)];
-            play303Note(f, now);
-        }
+        const currentStep = synthStep;
+
+        // 1. Kick (4-on-the-floor: beats 0, 4, 8, 12)
+        if (currentStep % 4 === 0) play909Kick(now);
+
+        // 2. Offbeat Open Hi-Hat (beats 2, 6, 10, 14)
+        if (currentStep % 4 === 2) play909HiHat(now, true);
+        else play909HiHat(now, false); // 16th closed hats
+
+        // 3. Claps / Snares on beats 4 & 12
+        if (currentStep === 4 || currentStep === 12) play909Clap(now);
+
+        // 4. TB-303 Acid Note
+        play303Step(currentPattern[currentStep], now);
+
         synthStep = (synthStep + 1) % 16;
+        totalStepsPlayed++;
+
+        // Auto-evolve acid pattern every 32 steps (2 bars)
+        if (totalStepsPlayed % 32 === 0) {
+            mutatePattern();
+            // Subtle random cutoff drift
+            synthCutoff = 800 + Math.random() * 600;
+        }
     }, stepDuration * 1000);
 }
 
@@ -155,7 +329,7 @@ function playStation(idx) {
     } else {
         stopProceduralSynth();
         audioEl.src = station.streamUrl;
-        audioEl.play().catch(e => console.log('Audio playback waiting for interaction'));
+        audioEl.play().catch(e => console.log('Playback waiting for interaction'));
         isPlaying = true;
 
         if (!isVisualizerHooked && audioCtx) {
@@ -164,7 +338,7 @@ function playStation(idx) {
                 sourceNode.connect(analyser);
                 analyser.connect(audioCtx.destination);
                 isVisualizerHooked = true;
-            } catch(e) { console.log('Visualizer already connected'); }
+            } catch(e) { console.log('Visualizer ready'); }
         }
     }
 
@@ -200,8 +374,7 @@ function renderVisualizer() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (!analyser || !isPlaying) {
-        // Idle animation
-        ctx.fillStyle = 'rgba(0, 240, 255, 0.2)';
+        ctx.fillStyle = 'rgba(0, 240, 255, 0.25)';
         ctx.font = '13px Orbitron';
         ctx.textAlign = 'center';
         ctx.fillText('DARKAIS PROTOCOL IDLE // PRESS PLAY TO ENGAGE AUDIO SPECTRUM', canvas.width / 2, canvas.height / 2);
@@ -217,7 +390,7 @@ function renderVisualizer() {
         let x = 0;
 
         for (let i = 0; i < bufferLength; i++) {
-            const barHeight = (dataArray[i] / 255) * canvas.height * 0.85;
+            const barHeight = (dataArray[i] / 255) * canvas.height * 0.88;
             const gradient = ctx.createLinearGradient(0, canvas.height, 0, 0);
             gradient.addColorStop(0, '#00F0FF');
             gradient.addColorStop(0.5, '#A855F7');
@@ -271,7 +444,7 @@ function spawnChatMessage() {
 
     const el = document.createElement('div');
     el.className = 'chat-msg';
-    el.innerHTML = `<span class="chat-time">${time}</span><span class="chat-user">${user}:</span> ${msg}`;
+    el.innerHTML = \`<span class="chat-time">\${time}</span><span class="chat-user">\${user}:</span> \${msg}\`;
     box.appendChild(el);
     box.scrollTop = box.scrollHeight;
 }
@@ -296,7 +469,7 @@ function toggleRecord() {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `DarkAIs_Rave_Clip_${Date.now()}.webm`;
+            a.download = \`DarkAIs_Rave_Clip_\${Date.now()}.webm\`;
             a.click();
         };
         mediaRecorder.start();
@@ -317,16 +490,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const vol = document.getElementById('volumeSlider');
     if (vol) {
         vol.addEventListener('input', (e) => {
-            audioEl.volume = parseFloat(e.target.value);
+            const v = parseFloat(e.target.value);
+            audioEl.volume = v;
+            if (masterGain) masterGain.gain.setValueAtTime(v, audioCtx.currentTime);
         });
     }
 
-    // Synth Knobs
+    // Synth Controls
     const bpmSlider = document.getElementById('synthBpm');
     if (bpmSlider) {
         bpmSlider.addEventListener('input', (e) => {
             synthBpm = parseInt(e.target.value);
-            document.getElementById('bpmDisplay').innerText = synthBpm;
+            document.getElementById('bpmDisplay').innerText = synthBpm + ' BPM';
             if (synthInterval) startProceduralSynth();
         });
     }
@@ -335,6 +510,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (cutSlider) {
         cutSlider.addEventListener('input', (e) => {
             synthCutoff = parseFloat(e.target.value);
+        });
+    }
+
+    const resSlider = document.getElementById('synthRes');
+    if (resSlider) {
+        resSlider.addEventListener('input', (e) => {
+            synthResonance = parseFloat(e.target.value);
         });
     }
 
@@ -347,9 +529,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Chat Interval
     setInterval(spawnChatMessage, 4500);
-
-    // Canvas render loop
     renderVisualizer();
 });
