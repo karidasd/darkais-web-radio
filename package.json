@@ -1,0 +1,13 @@
+{
+  "name": "darkais-web-radio",
+  "version": "1.0.0",
+  "description": "24/7 Underground Electronic & Cyber Rave Web Radio Station",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DarkAIs Web Radio — 24/7 Underground Electronic & Cyber Rave</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;800;900&family=Roboto:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <a href="index.html">
+                <h1>⚡ DARKAIS <span class="accent">WEB RADIO</span> <span class="sub">24/7</span></h1>
+            </a>
+        </div>
+        <nav class="nav">
+            <a href="index.html" class="nav-link active">DJ Console</a>
+            <a href="generator.html" class="nav-link">🤖 AI Rave Studio</a>
+            <a href="streams.html" class="nav-link">📡 Global Streams</a>
+            <a href="https://karidasd.github.io/" target="_blank" class="nav-link">🌐 Portfolio</a>
+        </nav>
+        <div class="header-right">
+            <div class="on-air-badge"><span class="dot-ping"></span> LIVE ON AIR</div>
+            <a href="https://github.com/karidasd/darkais-web-radio" target="_blank" class="star-btn">⭐ Star Radio</a>
+        </div>
+    </header>
+
+    <main class="dj-container">
+        <div class="deck-layout">
+            <!-- Left: Main DJ Deck & Visualizer -->
+            <div class="main-console">
+                <!-- Station Selector Tabs -->
+                <div class="station-tabs">
+                    <button class="station-btn active" onclick="playStation(0)">⚡ Berlin Dark Techno</button>
+                    <button class="station-btn" onclick="playStation(1)">☣️ 90s Acid Rave</button>
+                    <button class="station-btn" onclick="playStation(2)">🌌 Cyber Darksynth</button>
+                    <button class="station-btn" onclick="playStation(3)">🌀 Dark Psytrance</button>
+                    <button class="station-btn ai-synth" onclick="playStation(4)">🤖 AI-303 Procedural</button>
+                </div>
+
+                <!-- Visualizer Display Box -->
+                <div class="visualizer-display">
+                    <div class="visualizer-header">
+                        <div class="track-info-box">
+                            <span class="now-playing-tag">CURRENTLY STREAMING //</span>
+                            <h2 class="track-title" id="trackTitle">Berlin Underground Dark Techno</h2>
+                            <p class="track-subtitle" id="trackSubtitle">140 BPM • Industrial & Acid Drops</p>
+                        </div>
+                        <div class="vis-mode-pills">
+                            <button class="vis-pill active" data-mode="bars">SPECTRUM BARS</button>
+                            <button class="vis-pill" data-mode="wave">OSCILLOSCOPE</button>
+                        </div>
+                    </div>
+                    <canvas id="visualizerCanvas" width="900" height="260"></canvas>
+                </div>
+
+                <!-- Controls Strip -->
+                <div class="controls-strip">
+                    <button class="play-btn-large" id="playBtnLarge" onclick="togglePlay()">▶</button>
+
+                    <div class="audio-sliders">
+                        <div class="slider-group">
+                            <label>MASTER VOLUME</label>
+                            <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.8">
+                        </div>
+                    </div>
+
+                    <div class="deck-aux-buttons">
+                        <button class="deck-btn" id="recordBtn" onclick="toggleRecord()">🔴 REC CLIP</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar: Live Synth Engine & Rave Chat -->
+            <aside class="sidebar-panel">
+                <!-- Live Procedural Synth Controls -->
+                <div class="deck-card">
+                    <div class="card-header">
+                        <h3>🎛️ AI-303 Synth Controls</h3>
+                        <span class="mono" style="font-size:11px; color:var(--purple);" id="bpmDisplay">140 BPM</span>
+                    </div>
+                    <div class="synth-grid">
+                        <div class="synth-knob-box">
+                            <span>BPM TEMPO</span>
+                            <input type="range" id="synthBpm" min="120" max="165" step="1" value="140">
+                        </div>
+                        <div class="synth-knob-box">
+                            <span>RESONANCE</span>
+                            <input type="range" id="synthCutoff" min="300" max="2200" step="50" value="900">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Rave Chat Stream -->
+                <div class="deck-card">
+                    <div class="card-header">
+                        <h3>💬 Cyber Rave Terminal</h3>
+                        <span class="mono" style="font-size:10px; color:var(--acid);">● 342 ONLINE</span>
+                    </div>
+                    <div class="chat-log-box" id="chatLogBox">
+                        <div class="chat-msg"><span class="chat-time">07:50</span><span class="chat-user">BerlinRauser:</span> DarkAIs 24/7 stream engaged! 🔥</div>
+                        <div class="chat-msg"><span class="chat-time">07:51</span><span class="chat-user">CyberAcid:</span> 303 resonance sounding lethal ⚡</div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 DarkAIs Web Radio. Created by <a href="https://karidasd.github.io/" target="_blank" style="color:var(--cyan); text-decoration:underline;">Dimitris Karydas</a> • <a href="https://github.com/karidasd/darkais-web-radio" target="_blank" style="color:#FFB800;">⭐ Star on GitHub</a></p>
+    </footer>
+
+    <script src="js/radio.js"></script>
+</body>
+</html>

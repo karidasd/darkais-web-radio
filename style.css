@@ -1,0 +1,127 @@
+/* 🎧 DARKAIS 24/7 CYBER RAVE WEB RADIO — MASTER STYLESHEET */
+:root {
+    --bg-dark: #05070C;
+    --bg-main: #090D15;
+    --bg-card: #0F1420;
+    --bg-panel: #151C2C;
+    --bg-glass: rgba(15, 20, 32, 0.92);
+    
+    --text-primary: #F1F5F9;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+    
+    --cyan: #00F0FF;
+    --cyan-glow: rgba(0, 240, 255, 0.35);
+    
+    --purple: #C084FC;
+    --purple-dark: #A855F7;
+    --purple-glow: rgba(168, 85, 247, 0.35);
+    
+    --acid: #39FF14;
+    --acid-glow: rgba(57, 255, 20, 0.35);
+    
+    --warning: #FFB800;
+    --danger: #FF0055;
+    
+    --border: #1E293B;
+    --border-light: #28374E;
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', -apple-system, sans-serif; }
+body { background-color: var(--bg-dark); color: var(--text-primary); line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+h1, h2, h3, h4, h5, h6 { font-family: 'Orbitron', sans-serif; letter-spacing: 0.5px; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+a { color: inherit; text-decoration: none; transition: all 0.2s ease; }
+
+/* Glowing Header */
+.header { display: flex; justify-content: space-between; align-items: center; padding: 12px 28px; background: var(--bg-glass); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+.logo a { display: flex; align-items: center; gap: 10px; }
+.logo h1 { font-size: 19px; font-weight: 800; }
+.logo .accent { color: var(--cyan); text-shadow: 0 0 12px var(--cyan-glow); }
+.logo .sub { color: var(--purple); }
+
+.nav { display: flex; align-items: center; gap: 8px; }
+.nav-link { color: var(--text-secondary); font-weight: 600; font-size: 13px; padding: 6px 12px; border-radius: var(--radius-sm); transition: all 0.2s; }
+.nav-link:hover, .nav-link.active { color: var(--cyan); background: rgba(0, 240, 255, 0.08); border: 1px solid rgba(0, 240, 255, 0.2); }
+
+.header-right { display: flex; align-items: center; gap: 12px; }
+.on-air-badge { display: flex; align-items: center; gap: 6px; padding: 4px 10px; background: rgba(255, 0, 85, 0.12); border: 1px solid var(--danger); border-radius: 20px; color: var(--danger); font-family: 'Orbitron', sans-serif; font-size: 10.5px; font-weight: 800; letter-spacing: 1px; }
+.dot-ping { width: 7px; height: 7px; background: var(--danger); border-radius: 50%; animation: ping 1.2s infinite; }
+@keyframes ping { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.4; } }
+
+.star-btn { background: rgba(255, 184, 0, 0.1); border: 1px solid rgba(255, 184, 0, 0.4); color: #FFB800; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+.star-btn:hover { background: #FFB800; color: #05070A; box-shadow: 0 0 15px rgba(255, 184, 0, 0.4); }
+
+/* DJ Deck / Hero Container */
+.dj-container { max-width: 1360px; margin: 0 auto; padding: 24px 20px 60px; width: 100%; flex: 1; }
+
+.deck-layout { display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start; }
+.main-console { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 26px; box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(0, 240, 255, 0.05); }
+
+/* Station Selector Bar */
+.station-tabs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
+.station-btn { display: flex; align-items: center; gap: 8px; background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-secondary); padding: 9px 16px; border-radius: var(--radius-md); font-family: 'Orbitron', sans-serif; font-size: 11.5px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s ease; }
+.station-btn:hover { border-color: var(--cyan); color: var(--text-primary); }
+.station-btn.active { background: rgba(0, 240, 255, 0.12); border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 16px var(--cyan-glow); }
+.station-btn.ai-synth { border-color: var(--purple-dark); color: var(--purple); }
+.station-btn.ai-synth.active { background: rgba(168, 85, 247, 0.15); border-color: var(--purple); color: #FFF; box-shadow: 0 0 18px var(--purple-glow); }
+
+/* Visualizer Display Box */
+.visualizer-display { background: #030508; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px; margin-bottom: 22px; position: relative; overflow: hidden; }
+.visualizer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.track-info-box { display: flex; flex-direction: column; }
+.now-playing-tag { font-family: 'Orbitron', sans-serif; font-size: 10px; color: var(--cyan); letter-spacing: 1px; }
+.track-title { font-size: 19px; font-weight: 800; color: #FFF; margin-top: 2px; }
+.track-subtitle { font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+
+.vis-mode-pills { display: flex; gap: 6px; }
+.vis-pill { background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-muted); padding: 3px 9px; border-radius: 12px; font-size: 10.5px; font-family: 'Orbitron', sans-serif; cursor: pointer; }
+.vis-pill.active { border-color: var(--cyan); color: var(--cyan); background: rgba(0, 240, 255, 0.1); }
+
+canvas#visualizerCanvas { width: 100%; height: 260px; display: block; border-radius: var(--radius-sm); }
+
+/* DJ Deck Controls */
+.controls-strip { display: grid; grid-template-columns: auto 1fr auto; gap: 20px; align-items: center; background: var(--bg-panel); border: 1px solid var(--border); padding: 16px 20px; border-radius: var(--radius-md); }
+.play-btn-large { width: 56px; height: 56px; border-radius: 50%; background: var(--cyan); border: none; color: #05070A; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 20px var(--cyan-glow); transition: all 0.2s ease; }
+.play-btn-large:hover { transform: scale(1.08); background: #FFF; box-shadow: 0 0 30px var(--cyan); }
+.play-btn-large.playing { background: var(--acid); box-shadow: 0 0 25px var(--acid-glow); }
+
+.audio-sliders { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.slider-group { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); }
+.slider-group label { font-family: 'Orbitron', sans-serif; font-size: 10px; color: var(--text-muted); }
+.slider-group input[type="range"] { accent-color: var(--cyan); }
+
+.deck-aux-buttons { display: flex; gap: 8px; }
+.deck-btn { background: var(--bg-card); border: 1px solid var(--border-light); color: var(--text-secondary); padding: 8px 12px; border-radius: var(--radius-sm); font-size: 12px; font-family: 'Orbitron', sans-serif; cursor: pointer; transition: all 0.2s; }
+.deck-btn:hover { border-color: var(--cyan); color: #FFF; }
+.deck-btn.recording { border-color: var(--danger); color: var(--danger); background: rgba(255, 0, 85, 0.1); animation: pulseRecord 1s infinite; }
+@keyframes pulseRecord { 0%, 100% { box-shadow: 0 0 10px rgba(255,0,85,0.2); } 50% { box-shadow: 0 0 20px rgba(255,0,85,0.6); } }
+
+/* Sidebar Panels */
+.sidebar-panel { display: flex; flex-direction: column; gap: 20px; }
+.deck-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px; }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.card-header h3 { font-size: 13.5px; color: var(--cyan); }
+
+/* Synth Live Controls Box */
+.synth-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+.synth-knob-box { background: var(--bg-panel); border: 1px solid var(--border); padding: 8px 10px; border-radius: var(--radius-sm); text-align: center; }
+.synth-knob-box span { font-size: 10px; color: var(--text-muted); font-family: 'Orbitron', sans-serif; display: block; margin-bottom: 4px; }
+.synth-knob-box input { width: 100%; accent-color: var(--purple); }
+
+/* Rave Chat Stream */
+.chat-log-box { height: 210px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; font-size: 12px; font-family: 'JetBrains Mono', monospace; padding-right: 4px; }
+.chat-msg { padding: 4px 8px; border-radius: 4px; background: rgba(21, 28, 44, 0.6); border-left: 2px solid var(--cyan); line-height: 1.4; }
+.chat-user { color: var(--cyan); font-weight: 700; margin-right: 4px; }
+.chat-time { color: var(--text-muted); font-size: 10px; float: right; }
+
+footer { background: var(--bg-card); border-top: 1px solid var(--border); padding: 18px 24px; text-align: center; color: var(--text-muted); font-size: 12px; margin-top: auto; }
+
+@media (max-width: 992px) {
+    .deck-layout { grid-template-columns: 1fr; }
+    .header { padding: 10px 14px; flex-wrap: wrap; gap: 10px; }
+    .nav { order: 3; width: 100%; overflow-x: auto; }
+}

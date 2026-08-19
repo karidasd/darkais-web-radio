@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Rave Studio — DarkAIs Web Radio</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;800;900&family=Roboto:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <a href="index.html">
+                <h1>⚡ DARKAIS <span class="accent">WEB RADIO</span> <span class="sub">24/7</span></h1>
+            </a>
+        </div>
+        <nav class="nav">
+            <a href="index.html" class="nav-link">DJ Console</a>
+            <a href="generator.html" class="nav-link active">🤖 AI Rave Studio</a>
+            <a href="streams.html" class="nav-link">📡 Global Streams</a>
+            <a href="https://karidasd.github.io/" target="_blank" class="nav-link">🌐 Portfolio</a>
+        </nav>
+        <div class="header-right">
+            <a href="https://github.com/karidasd/darkais-web-radio" target="_blank" class="star-btn">⭐ Star Radio</a>
+        </div>
+    </header>
+
+    <main class="dj-container" style="max-width: 1100px;">
+        <div class="visualizer-display" style="padding: 24px; margin-bottom: 24px;">
+            <span class="now-playing-tag">SYNTHESIZE ELECTRONIC MUSIC WITH ARTIFICIAL INTELLIGENCE //</span>
+            <h2 class="track-title" style="font-size:26px; margin: 6px 0 10px;">🤖 The DarkAIs AI Music Composition Vault</h2>
+            <p style="color:var(--text-secondary); font-size:14px; line-height:1.6;">Use these battle-tested prompts in <strong>Suno AI (suno.com)</strong> or <strong>Udio (udio.com)</strong> in Custom Instrumental Mode to generate studio-grade rave and dark techno tracks in seconds.</p>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="deck-card">
+                <div class="card-header">
+                    <h3>⚡ Industrial Dark Techno (Berlin 140 BPM)</h3>
+                    <button class="deck-btn" onclick="copyPrompt('p1', this)">COPY PROMPT</button>
+                </div>
+                <pre style="background:#04060A; padding:14px; border-radius:6px; font-family:'JetBrains Mono'; font-size:13px; color:#00F0FF; white-space:pre-wrap;" id="p1">140 BPM, Industrial Dark Techno, heavy 909 rolling sub-bass, Roland TB-303 acid bassline, dark metallic percussions, aggressive synth stabs, dark cyberpunk rave, Berlin underground club, energetic build-up and explosive drop</pre>
+            </div>
+
+            <div class="deck-card">
+                <div class="card-header">
+                    <h3>☣️ 90s Oldschool Acid Rave & Breakbeat Hardcore</h3>
+                    <button class="deck-btn" onclick="copyPrompt('p2', this)">COPY PROMPT</button>
+                </div>
+                <pre style="background:#04060A; padding:14px; border-radius:6px; font-family:'JetBrains Mono'; font-size:13px; color:#39FF14; white-space:pre-wrap;" id="p2">150 BPM, 90s Oldschool Acid Rave, fast breakbeat drums, squelchy 303 acid resonance filter sweeps, rave sirens, classic rave piano stabs, high energy hardcore techno, underground warehouse party</pre>
+            </div>
+
+            <div class="deck-card">
+                <div class="card-header">
+                    <h3>🌌 Dystopian Cyberpunk Midtempo / Darksynth</h3>
+                    <button class="deck-btn" onclick="copyPrompt('p3', this)">COPY PROMPT</button>
+                </div>
+                <pre style="background:#04060A; padding:14px; border-radius:6px; font-family:'JetBrains Mono'; font-size:13px; color:#C084FC; white-space:pre-wrap;" id="p3">110 BPM, Cyberpunk Darksynth, aggressive distorted Reese bass, heavy analog synths, dark electro groove, industrial glitch, cinematic dystopian rave</pre>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 DarkAIs Web Radio. Created by <a href="https://karidasd.github.io/" target="_blank" style="color:var(--cyan); text-decoration:underline;">Dimitris Karydas</a> • <a href="https://github.com/karidasd/darkais-web-radio" target="_blank" style="color:#FFB800;">⭐ Star on GitHub</a></p>
+    </footer>
+
+    <script>
+        function copyPrompt(id, btn) {
+            const text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const old = btn.innerText;
+                btn.innerText = 'COPIED!';
+                setTimeout(() => { btn.innerText = old; }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
