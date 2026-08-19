@@ -215,6 +215,14 @@ const canvas = document.getElementById('visualizerCanvas');
 const ctx = canvas.getContext('2d');
 let animationFrame = 0;
 
+function resizeCanvas() {
+    if (canvas && canvas.parentElement && !document.fullscreenElement) {
+        canvas.width = canvas.parentElement.clientWidth - 28 || 800;
+        canvas.height = 220;
+    }
+}
+window.addEventListener('resize', resizeCanvas);
+
 function renderVisualizer() {
     requestAnimationFrame(renderVisualizer);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -374,5 +382,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', unlock);
     document.addEventListener('touchstart', unlock);
 
+    resizeCanvas();
     renderVisualizer();
 });
