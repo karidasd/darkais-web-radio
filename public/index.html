@@ -22,6 +22,13 @@
             <a href="https://karidasd.github.io/" target="_blank" class="nav-link">🌐 Portfolio</a>
         </nav>
         <div class="header-right">
+            <!-- 🎨 4 CYBER THEME PICKERS -->
+            <div class="theme-picker">
+                <div class="theme-dot cyber" onclick="setTheme('cyber')" title="Cyber Cyan"></div>
+                <div class="theme-dot matrix" onclick="setTheme('matrix')" title="Matrix Green"></div>
+                <div class="theme-dot crimson" onclick="setTheme('crimson')" title="Cyberpunk Crimson"></div>
+                <div class="theme-dot synthwave" onclick="setTheme('synthwave')" title="80s Synthwave"></div>
+            </div>
             <div class="on-air-badge"><span class="dot-ping"></span> 24/7 ON AIR</div>
             <a href="https://github.com/karidasd/darkais-web-radio" target="_blank" class="star-btn">⭐ Star Radio</a>
         </div>
@@ -61,10 +68,10 @@
                             <button class="vis-pill" onclick="toggleFullscreenRave()" style="border-color:var(--acid); color:var(--acid);">📺 FULLSCREEN</button>
                         </div>
                     </div>
-                    <canvas id="visualizerCanvas" width="900" height="260"></canvas>
+                    <canvas id="visualizerCanvas" width="900" height="220"></canvas>
                 </div>
 
-                <!-- Controls Strip -->
+                <!-- DJ Controls Strip -->
                 <div class="controls-strip">
                     <button class="play-btn-large" id="playBtnLarge" onclick="togglePlay()">▶</button>
 
@@ -73,62 +80,88 @@
                             <label>VOLUME</label>
                             <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.8">
                         </div>
-                        <div class="slider-group">
-                            <label>BASS BOOST (+12dB)</label>
-                            <input type="range" id="bassBoostSlider" min="0" max="14" step="1" value="6" style="accent-color:var(--acid);">
-                        </div>
-                        <div class="slider-group">
-                            <label>TREBLE BRIGHTNESS</label>
-                            <input type="range" id="trebleSlider" min="-6" max="10" step="1" value="3" style="accent-color:var(--cyan);">
-                        </div>
                     </div>
 
                     <div class="deck-aux-buttons">
-                        <button class="deck-btn" id="recordBtn" onclick="toggleRecord()">🔴 REC CLIP</button>
+                        <button class="deck-btn" onclick="triggerFx('drop')" style="border-color:var(--danger); color:var(--danger);">💥 DROP</button>
+                        <button class="deck-btn" onclick="triggerFx('airhorn')" style="border-color:var(--warning); color:var(--warning);">🚨 AIRHORN</button>
+                        <button class="deck-btn" onclick="triggerFx('laser')" style="border-color:var(--acid); color:var(--acid);">⚡ LASER</button>
+                    </div>
+                </div>
+
+                <!-- 🎹 PLAY-ALONG CYBER MINI SYNTH KEYBOARD -->
+                <div class="synth-keyboard-box">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-family:'Orbitron'; font-size:11px; color:var(--cyan); font-weight:bold;">🎹 PLAY-ALONG CYBER SYNTH (Click or use Keys: A, W, S, E, D, F, T, G, Y, H, U, J, K)</span>
+                        <span class="mono" style="font-size:10px; color:var(--text-muted);">LIVE ACID LEAD</span>
+                    </div>
+                    <div class="synth-keys">
+                        <div class="key-white" data-note="C4" onclick="playSynthNote('C4')">C (A)</div>
+                        <div class="key-black" data-note="Cs4" style="left: 10%;" onclick="playSynthNote('Cs4')">C# (W)</div>
+                        <div class="key-white" data-note="D4" onclick="playSynthNote('D4')">D (S)</div>
+                        <div class="key-black" data-note="Ds4" style="left: 22%;" onclick="playSynthNote('Ds4')">D# (E)</div>
+                        <div class="key-white" data-note="E4" onclick="playSynthNote('E4')">E (D)</div>
+                        <div class="key-white" data-note="F4" onclick="playSynthNote('F4')">F (F)</div>
+                        <div class="key-black" data-note="Fs4" style="left: 47%;" onclick="playSynthNote('Fs4')">F# (T)</div>
+                        <div class="key-white" data-note="G4" onclick="playSynthNote('G4')">G (G)</div>
+                        <div class="key-black" data-note="Gs4" style="left: 60%;" onclick="playSynthNote('Gs4')">G# (Y)</div>
+                        <div class="key-white" data-note="A4" onclick="playSynthNote('A4')">A (H)</div>
+                        <div class="key-black" data-note="As4" style="left: 73%;" onclick="playSynthNote('As4')">A# (U)</div>
+                        <div class="key-white" data-note="B4" onclick="playSynthNote('B4')">B (J)</div>
+                        <div class="key-white" data-note="C5" onclick="playSynthNote('C5')">C (K)</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Sidebar: DJ Sound FX Launchpad & Pomodoro -->
+            <!-- Right Sidebar -->
             <aside class="sidebar-panel">
-                <!-- DJ Sound FX Launchpad -->
+                <!-- 🎛️ SPINNING CYBER VINYL DECK -->
                 <div class="deck-card">
                     <div class="card-header">
-                        <h3>🎛️ DJ Sound FX Launchpad</h3>
-                        <span class="mono" style="font-size:10px; color:var(--cyan);">LIVE PADS</span>
+                        <h3>🎛️ Turntable Deck</h3>
+                        <span class="mono" style="font-size:10px; color:var(--cyan);" id="bpmStat">140 BPM</span>
                     </div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
-                        <button class="deck-btn" onclick="triggerFx('airhorn')" style="border-color:var(--warning); color:var(--warning); font-size:11px;">🚨 AIRHORN</button>
-                        <button class="deck-btn" onclick="triggerFx('drop')" style="border-color:var(--danger); color:var(--danger); font-size:11px;">💥 BASS DROP</button>
-                        <button class="deck-btn" onclick="triggerFx('laser')" style="border-color:var(--acid); color:var(--acid); font-size:11px;">⚡ ACID LASER</button>
-                        <button class="deck-btn" onclick="triggerFx('voice')" style="border-color:var(--purple); color:var(--purple); font-size:11px;">🗣️ CYBER VOICE</button>
-                        <button class="deck-btn" onclick="triggerFx('scratch')" style="grid-column: span 2; border-color:var(--cyan); color:var(--cyan); font-size:11px;">🎚️ VINYL SCRATCH</button>
+                    <div class="vinyl-container">
+                        <div class="spinning-vinyl" id="spinningVinyl" onclick="triggerFx('scratch')">
+                            <div class="vinyl-center">DARKAIS</div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Developer Focus / Pomodoro Timer -->
+                <!-- 🤖 AI CYBER DJ VOICE DROPS -->
+                <div class="deck-card">
+                    <div class="card-header">
+                        <h3>🤖 AI Cyber Voice Drops</h3>
+                        <span class="mono" style="font-size:10px; color:var(--purple);">VOCODER</span>
+                    </div>
+                    <div style="display:flex; gap:6px; margin-top:6px;">
+                        <input type="text" id="cyberVoiceInput" value="Welcome to Athens Cyber Underground" style="flex:1; background:var(--bg-panel); border:1px solid var(--border); color:#FFF; padding:6px 8px; border-radius:4px; font-size:11px;">
+                        <button class="deck-btn" onclick="speakCyberDrop()" style="border-color:var(--purple); color:var(--purple); font-size:10px;">🎙️ SAY IT</button>
+                    </div>
+                </div>
+
+                <!-- 📂 DRAG & DROP LOCAL MP3 JUKEBOX -->
+                <div class="deck-card">
+                    <div class="card-header">
+                        <h3>📂 Drop Suno / AI Tracks</h3>
+                        <span class="mono" style="font-size:10px; color:var(--acid);">LOCAL MP3</span>
+                    </div>
+                    <input type="file" id="fileInput" accept="audio/*" style="display:none;">
+                    <div class="drop-zone" id="dropZone">
+                        <span>📁 Drag & Drop MP3 or Click to Upload</span>
+                    </div>
+                </div>
+
+                <!-- Rave Pomodoro Focus -->
                 <div class="deck-card">
                     <div class="card-header">
                         <h3>⏱️ Rave Focus Pomodoro</h3>
                         <span class="mono" style="font-size:11px; color:var(--acid);" id="timerStatus">OFF</span>
                     </div>
-                    <div style="display:flex; gap:6px; margin-top:8px;">
+                    <div style="display:flex; gap:6px; margin-top:6px;">
                         <button class="deck-btn" onclick="startPomodoro(25)" style="flex:1; font-size:10px;">25M FOCUS</button>
                         <button class="deck-btn" onclick="startPomodoro(45)" style="flex:1; font-size:10px;">45M DEEP</button>
                         <button class="deck-btn" onclick="startPomodoro(5)" style="flex:1; font-size:10px;">5M REST</button>
-                    </div>
-                </div>
-
-                <!-- Station Stats -->
-                <div class="deck-card">
-                    <div class="card-header">
-                        <h3>📊 Station Telemetry</h3>
-                        <span class="mono" style="font-size:10px; color:var(--acid);">● ACTIVE</span>
-                    </div>
-                    <div style="font-size:12px; display:flex; flex-direction:column; gap:6px; color:var(--text-secondary);">
-                        <div>Tempo: <strong style="color:#FFF;" id="bpmStat">140 BPM</strong></div>
-                        <div>Stream Quality: <strong style="color:var(--cyan);">128 kbps MP3 Direct CDN</strong></div>
-                        <div>Network Latency: <strong style="color:var(--acid);">14 ms (Zero-Buffer)</strong></div>
                     </div>
                 </div>
             </aside>
