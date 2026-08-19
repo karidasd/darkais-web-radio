@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DarkAIs Web Radio — 24/7 Underground Electronic & Cyber Rave</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00F0FF">
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;800;900&family=Roboto:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 </head>
@@ -51,7 +53,7 @@
                 </div>
 
                 <!-- Visualizer Display Box -->
-                <div class="visualizer-display" id="visualizerDisplayBox">
+                <div class="visualizer-display" id="visualizerDisplayBox" title="Click anywhere to trigger Laser Shockwaves!">
                     <div class="visualizer-header">
                         <div class="track-info-box">
                             <div style="display:flex; align-items:center;">
@@ -74,6 +76,26 @@
                 <!-- DJ Controls Strip -->
                 <div class="controls-strip">
                     <button class="play-btn-large" id="playBtnLarge" onclick="togglePlay()">▶</button>
+
+                    <!-- Dual LED VU Meters -->
+                    <div class="vu-meter-box" title="Master Audio Peak Levels">
+                        <div class="vu-bar">
+                            <div class="vu-led green"></div>
+                            <div class="vu-led green"></div>
+                            <div class="vu-led green"></div>
+                            <div class="vu-led yellow"></div>
+                            <div class="vu-led yellow"></div>
+                            <div class="vu-led red"></div>
+                        </div>
+                        <div class="vu-bar">
+                            <div class="vu-led green"></div>
+                            <div class="vu-led green"></div>
+                            <div class="vu-led green"></div>
+                            <div class="vu-led yellow"></div>
+                            <div class="vu-led yellow"></div>
+                            <div class="vu-led red"></div>
+                        </div>
+                    </div>
 
                     <div class="audio-sliders">
                         <div class="slider-group">
@@ -168,6 +190,16 @@
                             <div class="vinyl-center">DARKAIS</div>
                         </div>
                     </div>
+                </div>
+
+                <!-- 🎲 AI RAVE PROMPT ROULETTE -->
+                <div class="deck-card">
+                    <div class="card-header">
+                        <h3>🎲 Suno AI Prompt Roulette</h3>
+                        <span class="mono" style="font-size:10px; color:var(--warning);">1-CLICK</span>
+                    </div>
+                    <div style="font-size:11.5px; color:#C084FC; font-family:'JetBrains Mono'; background:#04070C; padding:8px; border-radius:4px; margin-bottom:8px; line-height:1.4;" id="ravePromptOutput">145 BPM, Industrial Hard Techno, Roland TB-303 squelch, rolling 909 sub, Berlin rave drop</div>
+                    <button class="deck-btn" id="rollPromptBtn" onclick="rollRavePrompt()" style="width:100%; border-color:var(--warning); color:var(--warning); font-size:10.5px;">🎲 ROLL & COPY PROMPT</button>
                 </div>
 
                 <!-- 🤖 AI CYBER DJ VOICE DROPS -->

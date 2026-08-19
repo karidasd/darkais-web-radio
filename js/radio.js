@@ -65,10 +65,13 @@ let audioEl = new Audio();
 audioEl.preload = "none";
 
 let audioCtx = null;
-let visMode = 'tunnel'; // 'tunnel', 'bars', 'wave'
+let visMode = 'tunnel';
 let isAudioUnlocked = false;
 
-// ── 1. BULLETPROOF WEB AUDIO CONTEXT (FOR FX & SYNTH) ─────────────────────
+// Particles for click shockwaves
+let particles = [];
+
+// ── 1. BULLETPROOF WEB AUDIO CONTEXT ──────────────────────────────────────
 function getAudioContext() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -80,7 +83,7 @@ function getAudioContext() {
     return audioCtx;
 }
 
-// ── 2. 🎹 PLAY-ALONG CYBER MINI SYNTH (LIVE ACID KEYS) ─────────────────────
+// ── 2. 🎹 PLAY-ALONG CYBER MINI SYNTH ─────────────────────────────────────
 const KEY_FREQS = {
     'C4': 261.63, 'Cs4': 277.18, 'D4': 293.66, 'Ds4': 311.13,
     'E4': 329.63, 'F4': 349.23, 'Fs4': 369.99, 'G4': 392.00,
@@ -107,7 +110,6 @@ function playSynthNote(noteName) {
     osc.type = 'sawtooth';
     osc.frequency.setValueAtTime(freq, now);
 
-    // Acid lowpass filter sweep
     filter.type = 'lowpass';
     filter.frequency.setValueAtTime(600, now);
     filter.frequency.exponentialRampToValueAtTime(2400, now + 0.04);
@@ -168,8 +170,6 @@ function triggerFx(fxType) {
         gain.connect(ctx.destination);
         osc.start(now);
         osc.stop(now + 0.24);
-    } else if (fxType === 'voice') {
-        speakCyberDrop("DarkAIs Cyber Rave Protocol Engaged");
     } else if (fxType === 'scratch') {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
@@ -183,6 +183,21 @@ function triggerFx(fxType) {
         gain.connect(ctx.destination);
         osc.start(now);
         osc.stop(now + 0.22);
+    } else if (fxType === 'static') {
+        // Radio Static Glitch for station transitions
+        const bufferSize = ctx.sampleRate * 0.12;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+        noise.connect(gain);
+        gain.connect(ctx.destination);
+        noise.start(now);
+        noise.stop(now + 0.12);
     }
 }
 
@@ -198,7 +213,32 @@ function speakCyberDrop(customText) {
     }
 }
 
-// ── 5. 📂 LOCAL MP3 DRAG & DROP JUKEBOX ───────────────────────────────────
+// ── 5. 🎲 AI RAVE PROMPT ROULETTE ─────────────────────────────────────────
+const RAVE_PROMPTS = [
+    "145 BPM, Industrial Hard Techno, Roland TB-303 squelch resonance, heavy 909 rolling sub, dark warehouse Berlin",
+    "174 BPM, Neurofunk Drum & Bass, aggressive Reece bassline, razor sharp breakbeats, dystopian cyberpunk drop",
+    "150 BPM, 90s Acid Rave, rave piano stabs, resonant filter sweeps, classic rave siren, hardcore breakbeat",
+    "128 BPM, French Complextro, glitch electro bass, Justice style distorted synth stabs, heavy club groove",
+    "148 BPM, Dark Psytrance, forest Goa frequency modulation, hypnotic rolling bass, alien synth leads",
+    "115 BPM, Cyberpunk Darksynth, distorted analog synths, dark electro midtempo, cinematic dystopian rave"
+];
+
+function rollRavePrompt() {
+    const p = RAVE_PROMPTS[Math.floor(Math.random() * RAVE_PROMPTS.length)];
+    const el = document.getElementById('ravePromptOutput');
+    if (el) {
+        el.innerText = p;
+        navigator.clipboard.writeText(p);
+        const btn = document.getElementById('rollPromptBtn');
+        if (btn) {
+            const old = btn.innerText;
+            btn.innerText = '✓ COPIED!';
+            setTimeout(() => { btn.innerText = old; }, 1800);
+        }
+    }
+}
+
+// ── 6. 📂 LOCAL MP3 DRAG & DROP JUKEBOX ───────────────────────────────────
 function handleLocalTrack(file) {
     if (!file) return;
     const url = URL.createObjectURL(file);
@@ -218,7 +258,7 @@ function handleLocalTrack(file) {
     });
 }
 
-// ── 6. 🎨 CYBER THEME SWITCHER ─────────────────────────────────────────────
+// ── 7. 🎨 CYBER THEME SWITCHER ─────────────────────────────────────────────
 function setTheme(theme) {
     document.body.className = '';
     if (theme && theme !== 'cyber') {
@@ -227,7 +267,7 @@ function setTheme(theme) {
     localStorage.setItem('darkais_theme', theme);
 }
 
-// ── 7. BULLETPROOF STREAM PLAYBACK ─────────────────────────────────────────
+// ── 8. BULLETPROOF STREAM PLAYBACK ─────────────────────────────────────────
 function setStreamStatus(statusText, color = '#00F0FF') {
     const el = document.getElementById('streamStatusBadge');
     if (el) {
@@ -240,6 +280,7 @@ function playStation(idx) {
     currentStationIdx = idx;
     const station = STATIONS[idx];
     getAudioContext();
+    triggerFx('static');
 
     document.getElementById('trackTitle').innerText = station.name;
     document.getElementById('trackSubtitle').innerText = station.sub;
@@ -295,7 +336,7 @@ function updatePlayButton() {
     }
 }
 
-// ── 8. RESPONSIVE REALTIME CANVAS VISUALIZER ──────────────────────────────
+// ── 9. RESPONSIVE REALTIME CANVAS VISUALIZER & SHOCKWAVE PARTICLES ────────
 const canvas = document.getElementById('visualizerCanvas');
 const ctx = canvas.getContext('2d');
 let animationFrame = 0;
@@ -319,7 +360,7 @@ function renderVisualizer() {
 
     if (!isPlaying) {
         ctx.fillStyle = 'rgba(0, 240, 255, 0.3)';
-        ctx.font = '13px Orbitron';
+        ctx.font = '14px Orbitron';
         ctx.textAlign = 'center';
         ctx.fillText('⚡ DARKAIS 24/7 CYBER RAVE RADIO // CLICK PLAY TO STREAM', cx, cy);
         return;
@@ -329,6 +370,9 @@ function renderVisualizer() {
     const currentBpm = STATIONS[currentStationIdx]?.bpm || 140;
     const beatPhase = (Date.now() / (60000 / currentBpm)) * Math.PI * 2;
     const pulse = Math.pow(Math.sin(beatPhase), 4);
+
+    // Update VU LEDs
+    updateVuMeters(pulse);
 
     if (visMode === 'tunnel') {
         const angle = animationFrame * 0.02 + pulse * 0.05;
@@ -393,9 +437,35 @@ function renderVisualizer() {
         ctx.stroke();
         ctx.shadowBlur = 0;
     }
+
+    // Render Click Particles / Laser Shockwaves
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.03;
+        if (p.life <= 0) {
+            particles.splice(i, 1);
+            continue;
+        }
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+        ctx.fill();
+    }
 }
 
-// ── 9. FULLSCREEN RAVE MODE ───────────────────────────────────────────────
+function updateVuMeters(pulse) {
+    const leds = document.querySelectorAll('.vu-led');
+    if (!leds || leds.length === 0) return;
+    const activeCount = Math.floor(pulse * leds.length * 1.3);
+
+    leds.forEach((led, i) => {
+        led.classList.toggle('lit', i < activeCount);
+    });
+}
+
+// ── 10. FULLSCREEN RAVE MODE ──────────────────────────────────────────────
 function toggleFullscreenRave() {
     const disp = document.getElementById('visualizerDisplayBox');
     if (!document.fullscreenElement) {
@@ -409,7 +479,7 @@ function toggleFullscreenRave() {
     }
 }
 
-// ── 10. POMODORO TIMER ─────────────────────────────────────────────────────
+// ── 11. POMODORO TIMER ─────────────────────────────────────────────────────
 let timerInterval = null;
 let timerSeconds = 0;
 
@@ -433,13 +503,11 @@ function startPomodoro(minutes) {
     }, 1000);
 }
 
-// ── 11. INITIALIZATION & KEYBOARD LISTENERS ─────────────────────────────────
+// ── 12. INITIALIZATION & LISTENERS ─────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-    // Load Saved Theme
     const savedTheme = localStorage.getItem('darkais_theme');
     if (savedTheme) setTheme(savedTheme);
 
-    // Volume Control
     const vol = document.getElementById('volumeSlider');
     if (vol) {
         vol.addEventListener('input', (e) => {
@@ -447,7 +515,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Visualizer Mode Buttons
     document.querySelectorAll('.vis-pill').forEach(pill => {
         pill.addEventListener('click', () => {
             if (pill.dataset.mode) {
@@ -458,7 +525,32 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Computer Keyboard Synth Event Listener
+    // Interactive Shockwave clicks on canvas
+    if (canvas) {
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+            const colors = ['#00F0FF', '#C084FC', '#39FF14', '#FFB800'];
+
+            for (let i = 0; i < 20; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 2 + Math.random() * 5;
+                particles.push({
+                    x: clickX,
+                    y: clickY,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    size: 3 + Math.random() * 4,
+                    life: 1.0
+                });
+            }
+            triggerFx('laser');
+        });
+    }
+
+    // Keyboard Synth Listener
     window.addEventListener('keydown', (e) => {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         const key = e.key.toLowerCase();
@@ -473,10 +565,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Drag and Drop Zone
+    // Drag & Drop
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
-
     if (dropZone && fileInput) {
         dropZone.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', (e) => {
@@ -491,7 +582,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Auto-unlock audio on any page click
     const unlock = () => {
         getAudioContext();
         document.removeEventListener('click', unlock);

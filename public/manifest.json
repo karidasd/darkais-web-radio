@@ -1,0 +1,16 @@
+{
+  "name": "DarkAIs 24/7 Cyber Rave Web Radio",
+  "short_name": "DarkAIs Radio",
+  "description": "24/7 Underground Electronic & Cyber Rave Web Radio Station",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#05070C",
+  "theme_color": "#00F0FF",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
