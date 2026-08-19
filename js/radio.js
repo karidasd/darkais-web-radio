@@ -267,7 +267,7 @@ function renderVisualizer() {
             ctx.beginPath();
             ctx.moveTo(cx, cy);
             ctx.lineTo(cx + Math.cos(rot) * w * 0.6, cy + Math.sin(rot) * h * 0.6);
-            ctx.strokeStyle = \`rgba(57, 255, 20, \${0.25 + pulse * 0.6})\`;
+            ctx.strokeStyle = `rgba(57, 255, 20, ${0.25 + pulse * 0.6})`;
             ctx.lineWidth = 1.5;
             ctx.stroke();
         }
@@ -327,14 +327,14 @@ let timerSeconds = 0;
 function startPomodoro(minutes) {
     clearInterval(timerInterval);
     timerSeconds = minutes * 60;
-    document.getElementById('timerStatus').innerText = \`\${minutes}:00\`;
+    document.getElementById('timerStatus').innerText = `${minutes}:00`;
     if (!isPlaying) playStation(currentStationIdx);
 
     timerInterval = setInterval(() => {
         timerSeconds--;
         const m = Math.floor(timerSeconds / 60);
         const s = timerSeconds % 60;
-        document.getElementById('timerStatus').innerText = \`\${m}:\${s < 10 ? '0' : ''}\${s}\`;
+        document.getElementById('timerStatus').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
 
         if (timerSeconds <= 0) {
             clearInterval(timerInterval);
