@@ -91,24 +91,66 @@
 
                 <!-- 🎹 PLAY-ALONG CYBER MINI SYNTH KEYBOARD -->
                 <div class="synth-keyboard-box">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-family:'Orbitron'; font-size:11px; color:var(--cyan); font-weight:bold;">🎹 PLAY-ALONG CYBER SYNTH (Click or use Keys: A, W, S, E, D, F, T, G, Y, H, U, J, K)</span>
-                        <span class="mono" style="font-size:10px; color:var(--text-muted);">LIVE ACID LEAD</span>
+                    <div class="synth-header-bar">
+                        <div class="synth-title">🎹 PLAY-ALONG ACID SYNTH <span style="font-size:9.5px; color:var(--text-muted); font-weight:normal;">(Press keys or Click)</span></div>
+                        <span class="synth-badge">LIVE 303 LEAD</span>
                     </div>
-                    <div class="synth-keys">
-                        <div class="key-white" data-note="C4" onclick="playSynthNote('C4')">C (A)</div>
-                        <div class="key-black" data-note="Cs4" style="left: 10%;" onclick="playSynthNote('Cs4')">C# (W)</div>
-                        <div class="key-white" data-note="D4" onclick="playSynthNote('D4')">D (S)</div>
-                        <div class="key-black" data-note="Ds4" style="left: 22%;" onclick="playSynthNote('Ds4')">D# (E)</div>
-                        <div class="key-white" data-note="E4" onclick="playSynthNote('E4')">E (D)</div>
-                        <div class="key-white" data-note="F4" onclick="playSynthNote('F4')">F (F)</div>
-                        <div class="key-black" data-note="Fs4" style="left: 47%;" onclick="playSynthNote('Fs4')">F# (T)</div>
-                        <div class="key-white" data-note="G4" onclick="playSynthNote('G4')">G (G)</div>
-                        <div class="key-black" data-note="Gs4" style="left: 60%;" onclick="playSynthNote('Gs4')">G# (Y)</div>
-                        <div class="key-white" data-note="A4" onclick="playSynthNote('A4')">A (H)</div>
-                        <div class="key-black" data-note="As4" style="left: 73%;" onclick="playSynthNote('As4')">A# (U)</div>
-                        <div class="key-white" data-note="B4" onclick="playSynthNote('B4')">B (J)</div>
-                        <div class="key-white" data-note="C5" onclick="playSynthNote('C5')">C (K)</div>
+                    <div class="synth-keys-bed">
+                        <!-- White Keys -->
+                        <div class="key-white" data-note="C4" onclick="playSynthNote('C4')">
+                            <span class="key-note">C4</span>
+                            <kbd class="key-kbd">A</kbd>
+                        </div>
+                        <div class="key-white" data-note="D4" onclick="playSynthNote('D4')">
+                            <span class="key-note">D4</span>
+                            <kbd class="key-kbd">S</kbd>
+                        </div>
+                        <div class="key-white" data-note="E4" onclick="playSynthNote('E4')">
+                            <span class="key-note">E4</span>
+                            <kbd class="key-kbd">D</kbd>
+                        </div>
+                        <div class="key-white" data-note="F4" onclick="playSynthNote('F4')">
+                            <span class="key-note">F4</span>
+                            <kbd class="key-kbd">F</kbd>
+                        </div>
+                        <div class="key-white" data-note="G4" onclick="playSynthNote('G4')">
+                            <span class="key-note">G4</span>
+                            <kbd class="key-kbd">G</kbd>
+                        </div>
+                        <div class="key-white" data-note="A4" onclick="playSynthNote('A4')">
+                            <span class="key-note">A4</span>
+                            <kbd class="key-kbd">H</kbd>
+                        </div>
+                        <div class="key-white" data-note="B4" onclick="playSynthNote('B4')">
+                            <span class="key-note">B4</span>
+                            <kbd class="key-kbd">J</kbd>
+                        </div>
+                        <div class="key-white" data-note="C5" onclick="playSynthNote('C5')">
+                            <span class="key-note">C5</span>
+                            <kbd class="key-kbd">K</kbd>
+                        </div>
+
+                        <!-- Black Keys -->
+                        <div class="key-black" data-note="Cs4" style="left: 8.8%;" onclick="playSynthNote('Cs4')">
+                            <span class="key-note">C#</span>
+                            <kbd class="key-kbd">W</kbd>
+                        </div>
+                        <div class="key-black" data-note="Ds4" style="left: 21.2%;" onclick="playSynthNote('Ds4')">
+                            <span class="key-note">D#</span>
+                            <kbd class="key-kbd">E</kbd>
+                        </div>
+                        <div class="key-black" data-note="Fs4" style="left: 46.2%;" onclick="playSynthNote('Fs4')">
+                            <span class="key-note">F#</span>
+                            <kbd class="key-kbd">T</kbd>
+                        </div>
+                        <div class="key-black" data-note="Gs4" style="left: 58.7%;" onclick="playSynthNote('Gs4')">
+                            <span class="key-note">G#</span>
+                            <kbd class="key-kbd">Y</kbd>
+                        </div>
+                        <div class="key-black" data-note="As4" style="left: 71.2%;" onclick="playSynthNote('As4')">
+                            <span class="key-note">A#</span>
+                            <kbd class="key-kbd">U</kbd>
+                        </div>
                     </div>
                 </div>
             </div>
